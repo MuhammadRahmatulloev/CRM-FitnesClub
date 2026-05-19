@@ -1,0 +1,134 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #0a0f1e;
+  --bg-card: #111827;
+  --bg-input: #1a2234;
+  --border: #1e2d45;
+  --lime: #a3e635;
+  --lime-dark: #84cc16;
+  --text: #f1f5f9;
+  --text-muted: #64748b;
+  --danger: #ef4444;
+  --success: #22c55e;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', sans-serif;
+  min-height: 100vh;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--lime);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--lime);
+  color: #0a0f1e;
+  padding: 12px 24px;
+}
+
+.btn-primary:hover {
+  background: var(--lime-dark);
+}
+
+.btn-secondary {
+  background: var(--bg-input);
+  color: var(--text);
+  padding: 12px 24px;
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--lime);
+  color: var(--lime);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+  padding: 10px 20px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--lime);
+  margin-bottom: 24px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-lime { background: rgba(163, 230, 53, 0.15); color: var(--lime); }
+.badge-green { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+.badge-red { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+.badge-gray { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); }
+
+.error-msg {
+  color: var(--danger);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+}
