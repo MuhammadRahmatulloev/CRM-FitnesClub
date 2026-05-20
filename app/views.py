@@ -1,4 +1,4 @@
-from rest_framework import generics, status, views
+from rest_framework import generics, status, views, parsers
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -15,7 +15,7 @@ from .models import (
     User, ClientProfile, TrainerProfile,
     MembershipPlan, ClientMembership, Payment,
     TrainingPlan, TrainingWeek, TrainingDay, Exercise, ClientTrainingPlan,
-    Category, Product, Cart, CartItem, Order, OrderItem, Receipt
+    Category, Product, Cart, CartItem, Order, OrderItem, Receipt, Message
 )
 from .serializers import (
     PhoneTokenObtainPairSerializer,
@@ -29,10 +29,15 @@ from .serializers import (
     ClientTrainingPlanSerializer,
     CategorySerializer, ProductSerializer,
     CartSerializer, CartItemSerializer,
-    OrderSerializer, OrderStatusUpdateSerializer, ReceiptSerializer
+    OrderSerializer, OrderStatusUpdateSerializer, ReceiptSerializer,
+    MessageSerializer
 )
 from .permissions import IsAdmin, IsTrainer, IsClient, IsAdminOrTrainer, IsOwnerOrAdmin
 from .filters import UserFilter, ClientMembershipFilter, PaymentFilter, TrainingPlanFilter, ProductFilter, OrderFilter
+import mimetypes
+import os
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 
 @extend_schema(tags=['Auth'])
@@ -431,10 +436,15 @@ class CategoryListCreateView(generics.ListCreateAPIView):
     post=extend_schema(tags=['Shop'])
 )
 class ProductListCreateView(generics.ListCreateAPIView):
-    queryset = Product.objects.filter(is_available=True)
     serializer_class = ProductSerializer
     filterset_class = ProductFilter
     search_fields = ['name', 'description']
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'admin':
+            return Product.objects.all()
+        return Product.objects.filter(is_available=True)
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -596,3 +606,83 @@ class ReceiptView(generics.RetrieveAPIView):
     def get_object(self):
         order = get_object_or_404(Order, pk=self.kwargs['pk'])
         return get_object_or_404(Receipt, order=order)
+    
+
+@extend_schema(tags=['Chat'])
+class ChatUsersView(generics.ListAPIView):
+    serializer_class = UserListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'admin':
+            return User.objects.exclude(id=user.id)
+        if user.role == 'trainer':
+            return User.objects.filter(role__in=['client', 'admin']).exclude(id=user.id)
+        return User.objects.filter(role__in=['trainer', 'admin']).exclude(id=user.id)
+    
+
+
+@extend_schema(tags=['Chat'])
+class ChatFileUploadView(views.APIView):
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+
+    def post(self, request):
+        uploaded = request.FILES.get('file')
+        if not uploaded:
+            return Response({'detail': 'No file provided.'}, status=400)
+
+        mime, _ = mimetypes.guess_type(uploaded.name)
+        if mime and mime.startswith('audio'):
+            file_type = 'audio'
+        elif mime and mime.startswith('video'):
+            file_type = 'video'
+        else:
+            file_type = 'file'
+
+
+        file_name = uploaded.name
+        path = default_storage.save(f'chat_files/{file_name}', ContentFile(uploaded.read()))
+        file_url = path 
+
+        return Response({
+            'file_url':  file_url,
+            'file_type': file_type,
+            'file_name': file_name,
+        })
+
+
+@extend_schema_view(get=extend_schema(tags=['Chat']))
+class MessageListView(generics.ListAPIView):
+    serializer_class = MessageSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        other_id = self.kwargs['user_id']
+        from django.db.models import Q
+        return Message.objects.filter(
+            Q(sender=user, receiver_id=other_id) |
+            Q(sender_id=other_id, receiver=user)
+        ).order_by('created_at')
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        base_url = request.build_absolute_uri('/')[:-1]
+        data = response.data
+        if isinstance(data, dict) and 'results' in data:
+            messages_list = data['results']
+        elif isinstance(data, list):
+            messages_list = data
+        else:
+            messages_list = []
+        for msg in messages_list:
+            raw = msg.get('file')
+            if raw:
+                if raw.startswith('http'):
+                    msg['file_url'] = raw
+                elif raw.startswith('/'):
+                    msg['file_url'] = f"{base_url}{raw}"
+                else:
+                    msg['file_url'] = f"{base_url}/media/{raw}"
+            else:
+                msg['file_url'] = ''
+        return response

@@ -5,7 +5,7 @@ from .models import (
     User, ClientProfile, TrainerProfile,
     MembershipPlan, ClientMembership, Payment,
     TrainingPlan, TrainingWeek, TrainingDay, Exercise, ClientTrainingPlan,
-    Category, Product, Cart, CartItem, Order, OrderItem, Receipt
+    Category, Product, Cart, CartItem, Order, OrderItem, Receipt, Message
 )
 from .tasks import send_password_email
 import random
@@ -49,7 +49,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
             ClientProfile.objects.create(user=user)
         elif user.role == 'trainer':
             TrainerProfile.objects.create(user=user)
-        send_password_email.delay(user.email, user.first_name, user.phone_number, password)
+        send_password_email(user.email, user.first_name, user.phone_number, password)
         return user
 
 
@@ -232,3 +232,23 @@ class ReceiptSerializer(serializers.ModelSerializer):
     class Meta:
         model = Receipt
         fields = ['id', 'order', 'order_detail', 'issued_by', 'issued_by_name', 'issued_at']
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.CharField(source='sender.__str__', read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['id', 'sender', 'sender_name', 'receiver', 'content', 'created_at']
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.CharField(source='sender', read_only=True)
+
+    class Meta:
+        model = Message
+        fields = [
+            'id', 'sender', 'sender_name', 'receiver',
+            'content', 'file', 'file_type', 'file_name',
+            'created_at',
+        ]

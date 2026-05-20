@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,7 +51,7 @@ INSTALLED_APPS = [
     'app',
     'rest_framework.authtoken',
     'corsheaders',
-    
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,7 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'server.asgi.application'
 WSGI_APPLICATION = 'server.wsgi.application'
 
 
@@ -127,6 +129,7 @@ AUTH_USER_MODEL = 'app.User'
 
 AUTHENTICATION_BACKENDS = [
     'app.backends.PhoneBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 REST_FRAMEWORK = {
@@ -193,5 +196,11 @@ DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
 
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5212',
+    'http://localhost:5173',
 ]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}

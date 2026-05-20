@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+
 export default function Navbar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -37,27 +38,43 @@ export default function Navbar() {
         </Link>
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          {[
-            { path: '/', label: 'Home' },
-            { path: '/trainers', label: 'Trainers' },
-            { path: '/training', label: 'My Training' },
-            { path: '/membership', label: 'Membership' },
-            { path: '/shop', label: 'Shop' },
-            { path: '/orders', label: 'Orders' },
-          ].map(({ path, label }) => (
-            <Link key={path} to={path} style={{
-              textDecoration: 'none',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: 500,
-              color: isActive(path) ? 'var(--lime)' : 'var(--text-muted)',
-              background: isActive(path) ? 'rgba(163, 230, 53, 0.1)' : 'transparent',
-              transition: 'all 0.2s',
-            }}>
-              {label}
-            </Link>
-          ))}
+        {[
+          { path: '/', label: 'Home' },
+          { path: '/trainers', label: 'Trainers' },
+          { path: '/training', label: 'My Training' },
+          { path: '/membership', label: 'Membership' },
+          { path: '/shop', label: 'Shop' },
+          { path: '/orders', label: 'Orders' },
+          { path: '/chat', label: 'Chat' },
+        ].map(({ path, label }) => (
+          <Link key={path} to={path} style={{
+            textDecoration: 'none',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: 500,
+            color: isActive(path) ? 'var(--lime)' : 'var(--text-muted)',
+            background: isActive(path) ? 'rgba(163, 230, 53, 0.1)' : 'transparent',
+            transition: 'all 0.2s',
+          }}>
+            {label}
+          </Link>
+        ))}
+        
+        {user?.role === 'admin' && (
+          <Link to="/admin" style={{
+            textDecoration: 'none',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: 600,
+            color: isActive('/admin') ? '#0a0f1e' : 'var(--lime)',
+            background: isActive('/admin') ? 'var(--lime)' : 'rgba(163, 230, 53, 0.1)',
+            transition: 'all 0.2s',
+          }}>
+            Admin
+          </Link>
+        )}
         </div>
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>

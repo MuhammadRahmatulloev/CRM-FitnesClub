@@ -13,7 +13,8 @@ from .views import (
     ClientTrainingPlanListCreateView, MyTrainingPlanView, TodayTrainingView,
     CategoryListCreateView, ProductListCreateView, ProductDetailView,
     CartView, CartItemAddView, CartItemUpdateView, CartItemDeleteView, CartClearView,
-    CheckoutView, OrderListView, OrderDetailView, OrderStatusUpdateView, ReceiptView
+    CheckoutView, OrderListView, OrderDetailView, OrderStatusUpdateView, ReceiptView,
+    MessageListView, ChatUsersView, ChatFileUploadView,
 )
 
 urlpatterns = [
@@ -62,4 +63,7 @@ urlpatterns = [
     path('shop/orders/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
     path('shop/orders/<int:pk>/status/', OrderStatusUpdateView.as_view(), name='order-status-update'),
     path('shop/orders/<int:pk>/receipt/', ReceiptView.as_view(), name='receipt'),
+    path('chat/messages/<int:user_id>/', MessageListView.as_view(), name='message-list'),
+    path('chat/users/', ChatUsersView.as_view(), name='chat-users'),
+    path('chat/upload/', ChatFileUploadView.as_view(), name='chat-upload'),
 ]

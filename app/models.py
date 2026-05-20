@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 import uuid
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.conf import settings
 
 
 class UserManager(BaseUserManager):
@@ -241,3 +242,31 @@ class Receipt(models.Model):
 
     def __str__(self):
         return f"Receipt - {self.order}"
+    
+
+class Message(models.Model):
+    FILE_TYPE_CHOICES = [
+        ('text',  'Text'),
+        ('audio', 'Audio'),
+        ('video', 'Video'),
+        ('file',  'File'),
+    ]
+
+    sender     = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver   = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    content    = models.TextField(null=True, blank=True)
+    file       = models.FileField(upload_to='chat_files/', null=True, blank=True)
+    file_type  = models.CharField(max_length=10, choices=FILE_TYPE_CHOICES, default='text')
+    file_name  = models.CharField(max_length=255, null=True, blank=True)  
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.sender} → {self.receiver}: {self.file_type}"
+
+    @staticmethod
+    def build_room_name(user_id_1, user_id_2):
+        ids = sorted([int(user_id_1), int(user_id_2)])
+        return f"chat_{ids[0]}_{ids[1]}"

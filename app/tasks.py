@@ -3,7 +3,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 
-@shared_task
 def send_password_email(email, first_name, phone_number, password):
     subject = 'Welcome to Fitness Club'
     message = f"""
