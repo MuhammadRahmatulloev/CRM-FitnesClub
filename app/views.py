@@ -651,9 +651,10 @@ class ChatFileUploadView(views.APIView):
         })
 
 
-@extend_schema_view(get=extend_schema(tags=['Chat']))
+@extend_schema(tags=['Chat'])
 class MessageListView(generics.ListAPIView):
     serializer_class = MessageSerializer
+    pagination_class = None
 
     def get_queryset(self):
         user = self.request.user
@@ -666,23 +667,29 @@ class MessageListView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
-        base_url = request.build_absolute_uri('/')[:-1]
-        data = response.data
-        if isinstance(data, dict) and 'results' in data:
-            messages_list = data['results']
-        elif isinstance(data, list):
-            messages_list = data
-        else:
-            messages_list = []
-        for msg in messages_list:
-            raw = msg.get('file')
-            if raw:
-                if raw.startswith('http'):
-                    msg['file_url'] = raw
-                elif raw.startswith('/'):
-                    msg['file_url'] = f"{base_url}{raw}"
-                else:
-                    msg['file_url'] = f"{base_url}/media/{raw}"
-            else:
-                msg['file_url'] = ''
+        for msg in response.data:
+            if isinstance(msg, dict):
+                file_val = msg.get('file') or ''
+                msg['file_url'] = str(file_val) if file_val else ''
         return response
+    
+
+@extend_schema(tags=['Chat'])
+class MessageEditDeleteView(views.APIView):
+
+    def patch(self, request, pk):
+        msg = get_object_or_404(Message, pk=pk, sender=request.user)
+        if msg.file_type != 'text':
+            return Response({'detail': 'Only text messages can be edited.'}, status=400)
+        content = request.data.get('content', '').strip()
+        if not content:
+            return Response({'detail': 'Content cannot be empty.'}, status=400)
+        msg.content = content
+        msg.is_edited = True
+        msg.save()
+        return Response(MessageSerializer(msg).data)
+
+    def delete(self, request, pk):
+        msg = get_object_or_404(Message, pk=pk, sender=request.user)
+        msg.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

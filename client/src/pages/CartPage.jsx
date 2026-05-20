@@ -147,7 +147,7 @@ export default function CartPage() {
                   alignItems: 'center', justifyContent: 'center',
                 }}>
                   {item.product_detail?.image ? (
-                    <img src={`http://127.0.0.1:8000${item.product_detail.image}`}
+                    <img src={item.product_detail.image.startsWith('http') ? item.product_detail.image : `http://127.0.0.1:8000${item.product_detail.image}`}
                       alt={item.product_detail.name}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (

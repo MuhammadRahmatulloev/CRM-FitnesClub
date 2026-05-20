@@ -250,5 +250,6 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'sender', 'sender_name', 'receiver',
             'content', 'file', 'file_type', 'file_name',
+            'is_edited',   
             'created_at',
         ]

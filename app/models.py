@@ -257,7 +257,8 @@ class Message(models.Model):
     content    = models.TextField(null=True, blank=True)
     file       = models.FileField(upload_to='chat_files/', null=True, blank=True)
     file_type  = models.CharField(max_length=10, choices=FILE_TYPE_CHOICES, default='text')
-    file_name  = models.CharField(max_length=255, null=True, blank=True)  
+    file_name  = models.CharField(max_length=255, null=True, blank=True)
+    is_edited  = models.BooleanField(default=False)   # ← НОВОЕ
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

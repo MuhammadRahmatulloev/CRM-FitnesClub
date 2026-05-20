@@ -14,7 +14,7 @@ from .views import (
     CategoryListCreateView, ProductListCreateView, ProductDetailView,
     CartView, CartItemAddView, CartItemUpdateView, CartItemDeleteView, CartClearView,
     CheckoutView, OrderListView, OrderDetailView, OrderStatusUpdateView, ReceiptView,
-    MessageListView, ChatUsersView, ChatFileUploadView,
+    MessageListView, ChatUsersView, ChatFileUploadView, MessageEditDeleteView,
 )
 
 urlpatterns = [
@@ -66,4 +66,8 @@ urlpatterns = [
     path('chat/messages/<int:user_id>/', MessageListView.as_view(), name='message-list'),
     path('chat/users/', ChatUsersView.as_view(), name='chat-users'),
     path('chat/upload/', ChatFileUploadView.as_view(), name='chat-upload'),
+    path('chat/messages/<int:user_id>/', MessageListView.as_view(), name='message-list'),
+    path('chat/users/', ChatUsersView.as_view(), name='chat-users'),
+    path('chat/upload/', ChatFileUploadView.as_view(), name='chat-upload'),
+    path('chat/messages/<int:pk>/edit/', MessageEditDeleteView.as_view(), name='message-edit'), 
 ]

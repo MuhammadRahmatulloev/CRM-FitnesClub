@@ -39,6 +39,39 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except json.JSONDecodeError:
             return
 
+        action = payload.get("action")
+
+        if action == "message_delete":
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "chat.message",
+                    "message": {
+                        "action":     "message_deleted",
+                        "id":         payload.get("id"),
+                        "sender_id":  self.user.id,
+                        "created_at": "",
+                    },
+                },
+            )
+            return
+
+        if action == "message_edit":
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "chat.message",
+                    "message": {
+                        "action":     "message_edited",
+                        "id":         payload.get("id"),
+                        "content":    payload.get("content", ""),
+                        "sender_id":  self.user.id,
+                        "created_at": "",
+                    },
+                },
+            )
+            return
+
         file_type = payload.get("file_type") or "text"
 
         if file_type in SIGNAL_TYPES:
@@ -81,6 +114,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "file_url":    self._build_file_url(message),
                     "file_type":   message.file_type,
                     "file_name":   message.file_name or "",
+                    "is_edited":   False,
                     "sender_id":   message.sender_id,
                     "sender_name": str(message.sender),
                     "receiver_id": message.receiver_id,
@@ -124,6 +158,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             file_name=file_name or None,
         )
         if file_url:
-            message.file = file_url
+            message.file.name = file_url
         message.save()
         return Message.objects.select_related("sender", "receiver").get(id=message.id)

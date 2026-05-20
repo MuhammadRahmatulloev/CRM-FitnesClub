@@ -144,7 +144,7 @@ export default function ShopPage() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   {product.image ? (
-                    <img src={`http://127.0.0.1:8000${product.image}`} alt={product.name}
+                    <img src={product.image.startsWith('http') ? product.image : `http://127.0.0.1:8000${product.image}`} alt={product.name}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     <span style={{ fontSize: '48px', opacity: 0.3 }}>🛍</span>
