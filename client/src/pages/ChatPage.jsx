@@ -6,8 +6,8 @@ import VideoCall from './VideoCall'
 // const WS_BASE  = 'ws://127.0.0.1:8000'
 // const API_BASE = 'http://127.0.0.1:8000'
 
-const WS_BASE  = 'ws://muhammad.softclub.win'
-const API_BASE = 'http://muhammad.softclub.win'
+const WS_BASE  = 'wss://muhammad.softclub.win'
+const API_BASE = 'https://muhammad.softclub.win'
 
 /* ── SVG icons ─────────────────────────────────────────────────────────────── */
 const IconMic      = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>

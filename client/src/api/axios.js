@@ -5,7 +5,7 @@ import axios from 'axios'
 // })
 
 const api = axios.create({
-    baseURL: 'http://muhammad.softclub.win/api'
+    baseURL: 'https://muhammad.softclub.win/api'
 })
 
 api.interceptors.request.use((config) => {

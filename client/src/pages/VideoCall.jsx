@@ -9,8 +9,7 @@ const STUN_SERVERS = {
 
 // const WS_BASE = 'ws://localhost:8000'
 
-const WS_BASE = 'ws://muhammad.softclub.win'
-
+const WS_BASE = 'wss://muhammad.softclub.win'
 
 export default function VideoCall({ user, otherUser, token, onClose }) {
   const [status, setStatus]       = useState('connecting') // connecting | calling | in-call | ended
